@@ -7,6 +7,11 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * 
+ * @author Ivan Chacon
+ * 
+ */
 public class ChatClient {
 
 	public static void main(String[] args) {

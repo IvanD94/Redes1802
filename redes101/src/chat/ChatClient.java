@@ -23,7 +23,6 @@ public class ChatClient {
 
 			//Conexion con el servidor
 			Socket client = new Socket(InetAddress.getLocalHost(), 1248);
-			
 			System.out.println("Conectado al servidor");
 
 			//Lectura de datos desde la conexion con el servidor 

@@ -21,41 +21,62 @@ public class ChatClient {
 
 		try {
 
-			//Conexion con el servidor
+			// Conexion con el servidor
 			Socket client = new Socket(InetAddress.getLocalHost(), 1248);
 			System.out.println("Conectado al servidor");
 
-			//Lectura de datos desde la conexion con el servidor 
+			// Lectura de datos desde la conexion con el servidor
 			BufferedReader cIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			
-			//Escritura de datos por la conexion con el servidor
+
+			// Escritura de datos por la conexion con el servidor
 			PrintWriter cOut = new PrintWriter(client.getOutputStream(), true);
 
 			String comando = "";
-			System.out.print("Ingrese su nombre de usuario: ");
-			String user = in.readLine();
-			cOut.println(user);
 
-			//TODO En el server, mostrar lista de usuarios 
-			//System.out.println("Para consultar la lista de usuarios disponibles, digite el comando: Usuarios");
-			System.out.println("Para enviar un mensaje utilice el siguiente formato: <usuario de destino>:<mensaje>");
+			boolean valido = false;
+
+			String user = "";
+			while (!valido) {
+				System.out.print("Ingrese su nombre de usuario: ");
+				user = in.readLine();
+				cOut.println(user);
+				valido = "Valido".equals(cIn.readLine());
+				if (!valido) {
+					System.out.println("Usuario no válido");
+				}
+			}
+
+			System.out.println("\nBienvenid@ " + user + "\n");
+			System.out.println("Comandos disponibles:");
+			System.out.println("\t Consultar la lista de usuarios disponibles: u");
+			System.out.println("\t Realizar un broadcast a todos los usuarios: b <mensaje>");
+			System.out.println("\t Enviar un mensaje privado: m <usuario de destino>: <mensaje>");
+			System.out.println("\t Cerrar conexion: c\n");
 			
 			while (!comando.equalsIgnoreCase("close")) {
 
-				//Valida si hay algo disponible en consola para leer
+				// Valida si hay algo disponible en consola para leer
 				if (in.ready()) {
 					comando = in.readLine();
 					if (comando.equalsIgnoreCase("close")) {
+						cOut.println(comando);
 						break;
 					} else {
-						//Envia la informacion a la conexion
+						// Envia la informacion a la conexion
 						cOut.println(comando);
 					}
 				}
 
-				//Valida si hay algo disponible en la conexion
+				// Valida si hay algo disponible en la conexion
 				if (cIn.ready()) {
-					System.out.println(cIn.readLine());
+					String llegada = cIn.readLine();
+					if (llegada.equals("Kill")) {
+						System.out.println("El servidor se ha cerrado");
+						cOut.println("c");
+						break;
+					} else {
+						System.out.println(llegada);
+					}
 				}
 
 			}
@@ -67,13 +88,13 @@ public class ChatClient {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		try {
 			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
+
 	}
 
 }

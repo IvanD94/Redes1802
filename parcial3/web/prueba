@@ -1,0 +1,13 @@
+ $( "#login" ).submit(function( event ) {
+            	
+            	event.preventDefault();
+ 
+ 				var form = ( this );
+ 				
+ 				$.post("localhost",
+                      {
+                    id: form.id.value,
+                    password: form.pwd.value
+                });
+    			alert("hellomoto".concat(form.id.value));
+    			});

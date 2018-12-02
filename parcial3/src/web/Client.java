@@ -12,6 +12,7 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.net.ssl.SSLSocketFactory;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -40,8 +41,12 @@ public class Client extends Thread {
 	public void conectar() {
 
 		System.out.println("Conectando con el servidor...");
-
-		try (Socket socket = new Socket("localhost", 11234)) {
+		
+		System.setProperty("javax.net.ssl.trustStore", "keystore.jks");
+		
+		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+		
+		try (Socket socket = sf.createSocket("localhost", 11234)) {
 
 			PrintWriter sOut = new PrintWriter(socket.getOutputStream(), true);
 

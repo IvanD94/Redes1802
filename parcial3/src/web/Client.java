@@ -21,14 +21,41 @@ import javax.sound.sampled.SourceDataLine;
 
 public class Client extends Thread {
 
+	/**
+	 * Entero que indica al caballo al que se le realizó la apuesta.
+	 */
 	int caballo;
+
+	/**
+	 * Decimal que indica la cantidad de dinero apostado.
+	 */
 	double apuesta;
+
+	/**
+	 * Arreglo que contiene el progreso de cada caballo durante la carrera.
+	 */
 	String[] avance;
+
+	/**
+	 * Separador horizontal utilizado para dar formato a la salida de la información
+	 * durante la carrera
+	 */
 	String linea;
 
+	/**
+	 * Stream utilizado para pasar la información recibida a la linea de salida.
+	 */
 	AudioInputStream audioInputStream;
+
+	/**
+	 * Linea de audio utilizada para reproducir el sonido.
+	 */
 	SourceDataLine sourceDataLine;
 
+	/**
+	 * Constructor de la clase, inicializa el arreglo que contendra le progreso de
+	 * los caballos.
+	 */
 	public Client() {
 
 		avance = new String[6];
@@ -38,60 +65,66 @@ public class Client extends Thread {
 
 	}
 
+	/**
+	 * Realiza la solicitud de conexión con el servidor y maneja todo el proceso de
+	 * envió y recepción de información.
+	 */
 	public void conectar() {
 
 		System.out.println("Conectando con el servidor...");
-		
+
 		System.setProperty("javax.net.ssl.trustStore", "keystore.jks");
-		
+
 		SSLSocketFactory sf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-		
+
 		try (Socket socket = sf.createSocket("localhost", 11234)) {
 
 			PrintWriter sOut = new PrintWriter(socket.getOutputStream(), true);
 
 			BufferedReader sIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
+
 			String lin = "";
-			
+
 			try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in))) {
-				
+
 				boolean primero = true;
 				String id = "";
 				String password = "";
-				
+
+				// Permite realizar varios intentos de válidación en el sistema.
 				do {
-					
+
 					if (!primero) {
 						System.out.println("Datos incorrectos, intente nuevamente");
 					}
-					
+
 					System.out.print("Ingrese su usuario: ");
 					id = in.readLine();
 					System.out.print("Ingrese su password: ");
 					password = in.readLine();
-					
+
 					sOut.println(id + " " + password);
-					
+
 					System.out.println("Data send");
-					
+
 					primero = false;
-					
+
 				} while (!(lin = sIn.readLine()).equals("OK"));
-				
+
 				System.out.println(sIn.readLine());
-				
+
 				System.out.print("Indique el caballo al que desea apostarle: ");
 				caballo = Integer.parseInt(in.readLine());
 				System.out.print("Indique la cantidad de dinero a apostar: ");
 				apuesta = Double.parseDouble(in.readLine());
-				
+
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
+			// Envía la información de la apusta al servidor.
 			sOut.println(caballo + " " + apuesta);
 
 			System.out.println(sIn.readLine());
@@ -99,10 +132,12 @@ public class Client extends Thread {
 
 			System.out.println(sIn.readLine());
 
+			// Incia la reproducción de la transmisión de la narración.
 			iniciarTransmision();
 
 			System.out.println(sIn.readLine());
 
+			// Muestra el progreso de la carrera.
 			while (!(lin = sIn.readLine()).equals("Fin carrera")) {
 				System.out.print(mostrarCarrera(lin));
 			}
@@ -123,6 +158,13 @@ public class Client extends Thread {
 
 	}
 
+	/**
+	 * Da formato a la información enviada por el servidor.
+	 * 
+	 * @param datos
+	 *            - Información de la carrera en curso.
+	 * @return
+	 */
 	public String mostrarCarrera(String datos) {
 
 		if (datos.equals("null")) {
@@ -173,6 +215,9 @@ public class Client extends Thread {
 		return carrera.toString();
 	}
 
+	/**
+	 * Incia el separador horizontal, teniendo en cuenta la duración de la carrera.
+	 */
 	public void iniciarPatrones() {
 
 		StringBuilder sb = new StringBuilder();
@@ -191,11 +236,17 @@ public class Client extends Thread {
 
 	}
 
+	/**
+	 * Método heredado de la clase Thread que realiza un llamado al método conectar.
+	 */
 	@Override
 	public void run() {
 		conectar();
 	}
 
+	/**
+	 * Reproduce el audio de la narración.
+	 */
 	private void playAudio() {
 		byte[] buffer = new byte[10000];
 		try {
@@ -209,14 +260,26 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Crea e inicia el hilo encargado del proceso de recepción de la transmisión.
+	 */
 	public void iniciarTransmision() {
 		HiloTransmision hT = new HiloTransmision();
 		hT.start();
 	}
 
+	/**
+	 * Clase encargada del proceso de recibir y reproducir la narración.
+	 * 
+	 * @author IvanD94
+	 *
+	 */
 	class HiloTransmision extends Thread {
-
+		
+		/**
+		 * Crea la conexión con el servidor y realiza el proceso de recibir los paquetes.
+		 */
 		public void recibirTransmision() {
 
 			try (MulticastSocket multicastSocket = new MulticastSocket(9877)) {
@@ -227,7 +290,7 @@ public class Client extends Thread {
 				byte[] audioBuffer = new byte[10000];
 
 				while (true) {
-					
+
 					DatagramPacket packet = new DatagramPacket(audioBuffer, audioBuffer.length);
 					multicastSocket.receive(packet);
 
@@ -254,18 +317,25 @@ public class Client extends Thread {
 
 		}
 
+		/**
+		 * Método heredado de la clase Thread que permite la ejecución en paralelo del proceso de transmisión.
+		 */
 		@Override
 		public void run() {
 			recibirTransmision();
 		}
-		
+
 	}
 
+	/**
+	 * Método principal, crea una nueva instancia de la clase Client e inicia todo el proceso.
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		
+
 		Client c = new Client();
 		c.start();
-		
+
 	}
 
 }

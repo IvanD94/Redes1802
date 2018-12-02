@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+        <title>Turf</title>
+        <style>
+            
+            body{
+                font-family: 'Open Sans', sans-serif;
+                background: #994d00;
+                margin: 0 auto 0 auto;  
+                width: 100%; 
+                text-align: center;
+                margin: 20px 0px 20px 0px;
+                background-image: url(https://intellitix.com/hub/wp-content/uploads/sites/2/2017/08/Horse-Racing-Southwell-009.jpg);
+                background-size: cover;
+            }
+            
+            h1{
+                font-size: 1.5em;
+                color: #525252;
+            }
+            
+            .box{
+                background: rgba(255,255,255,0.7);
+                width: 300px;
+                height: 200px;
+                border-radius: 6px;
+                margin: 0 auto 0 auto;
+                padding: 0px 0px 70px 0px;
+                border: #663300 4px solid;
+                
+                top: 50%;
+                left: 50%;
+                position: absolute;
+                transform: translate(-50%, -50%);                
+            }
+            
+            .field{
+                background: #ecf0f1;
+                border: #ccc 1px solid;
+                border-bottom: #ccc 2px solid;
+                padding: 8px;
+                width: 250px;
+                color: #AAAAAA;
+                margin-top: 10px;
+                font-size: 1em;
+                border-radius: 4px;
+            }
+            
+            .btn{
+                float: left;
+                background: #994d00;
+                width: 200px;  
+                padding-top: 5px;
+                padding-bottom: 5px; 
+                color: white;
+                border-radius: 4px;
+                border: #331a00 1px solid;
+  
+                margin-top: 20px;
+                margin-bottom: 20px;
+                margin-left: 50px;
+                font-weight: 800;
+                font-size: 0.8em;
+            }
+        </style>
+        
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:700,600' rel='stylesheet' type='text/css'>
+    </head>
+
+    <body>
+        <div class="box">
+            <h1>Extreme Horse Racing</h1>
+            <form id = "login">
+                <input type="text" placeholder="username" name="id" class="field">
+                <br>
+                <input type="password" placeholder="password" name="pwd" class="field">
+                <br>
+                <input type="submit" value="Ingresar" onclick="ingresar(this.form)" class="btn">
+            </form>
+        </div>
+        
+        <script language="JavaScript" type="text/javascript">
+            
+           function ingresar (form){
+               window.location.replace("localhost/".concat(form.id.value).concat("-").concat(form.pwd.value));
+           }
+      
+        </script>
+        
+    </body>
+</html>
